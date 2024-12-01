@@ -97,7 +97,7 @@ const SubmissionsPage = () => {
         </TableHeader>
         <TableBody>
           {submissions.map((submission) => (
-            <TableRow key={submission._id}>
+            <TableRow key={submission._id} className="text-xs md:text-sm">
               <TableCell className="font-medium">{submission.name}</TableCell>
               <TableCell>{submission.email}</TableCell>
               <TableCell>
