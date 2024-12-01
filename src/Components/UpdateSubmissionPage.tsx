@@ -2,7 +2,6 @@ import { Button } from "./ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,7 +29,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const formSchema = z.object({
   name: z
@@ -47,28 +47,49 @@ const formSchema = z.object({
   comments: z.string().optional(),
 });
 
-const FormPage = () => {
+const UpdateSubmissionPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [subId, setSubId] = useState(null);
+  const { id } = useParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
+      // dob: "",
       department: "",
       comments: "",
     },
   });
 
+  useEffect(() => {
+    if (id) {
+      const fetchSubmissionData = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/submission/${id}`
+          );
+          const submission = response.data;
+          submission.dob = new Date(submission.dob);
+          setSubId(submission._id);
+          form.reset(submission);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchSubmissionData();
+    }
+  }, [id]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        "http://localhost:5000/api/submission/add",
-        values
+        "http://localhost:5000/api/submission/update",
+        { ...values, _id: subId }
       );
       console.log(response);
-      form.reset({});
     } catch (error) {
       console.log(error);
     } finally {
@@ -82,7 +103,6 @@ const FormPage = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 mx-auto max-w-lg"
       >
-        <h2 className="text-2xl font-bold">Add a submission</h2>
         <FormField
           control={form.control}
           name="name"
@@ -147,9 +167,6 @@ const FormPage = () => {
                   />
                 </PopoverContent>
               </Popover>
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -192,11 +209,11 @@ const FormPage = () => {
           )}
         />
         <Button disabled={isLoading} type="submit">
-          {isLoading && <Loader2 className="h-4 w-4 animate-spin" />} Submit
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin" />} Update
         </Button>
       </form>
     </Form>
   );
 };
 
-export default FormPage;
+export default UpdateSubmissionPage;

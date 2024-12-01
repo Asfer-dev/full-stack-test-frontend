@@ -1,7 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 interface Submission {
+  _id: string;
   name: string;
   email: string;
   dob: string;
@@ -12,38 +24,95 @@ interface Submission {
 const SubmissionsPage = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  // Set up the WebSocket connection when the component mounts
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:5000"); // Make sure to connect to the correct WebSocket endpoint
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket server");
+    };
+
+    ws.onmessage = (event) => {
+      const newSubmission = JSON.parse(event.data); // Assuming the data is a stringified JSON
+      setSubmissions((prevSubmissions) => [...prevSubmissions, newSubmission]);
+    };
+
+    ws.onclose = () => {
+      console.log("Disconnected from WebSocket server");
+    };
+
+    // Set the WebSocket instance to state
+    setSocket(ws);
+
+    // Clean up the WebSocket connection when the component unmounts
+    return () => {
+      ws.close();
+    };
+  }, []);
+
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/submissions") // Replace with your backend URL
+      .get("http://localhost:5000/api/submission") // Replace with your backend URL
       .then((response) => setSubmissions(response.data))
       .catch((error) => console.error(error));
   }, []);
 
+  const handleDelete = async (subId: string) => {
+    try {
+      const confirm = window.confirm("Do you want to delete this submission?");
+      if (confirm) {
+        const response = await axios.delete(
+          `http://localhost:5000/api/submission/${subId}`
+        );
+        console.log(response);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="p-4">
-      <h1>Submissions</h1>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Date of Birth</th>
-            <th>Department</th>
-            <th>Comments</th>
-          </tr>
-        </thead>
-        <tbody>
-          {submissions.map((submission, index) => (
-            <tr key={index}>
-              <td>{submission.name}</td>
-              <td>{submission.email}</td>
-              <td>{submission.dob}</td>
-              <td>{submission.department}</td>
-              <td>{submission.comments}</td>
-            </tr>
+      <h1 className="text-2xl font-bold mb-8">Submissions</h1>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Date of Birth</TableHead>
+            <TableHead>Department</TableHead>
+            <TableHead className="">Comments</TableHead>
+            <TableHead className="">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {submissions.map((submission) => (
+            <TableRow key={submission._id}>
+              <TableCell className="font-medium">{submission.name}</TableCell>
+              <TableCell>{submission.email}</TableCell>
+              <TableCell>{submission.dob}</TableCell>
+              <TableCell>{submission.department}</TableCell>
+              <TableCell className="">{submission.comments}</TableCell>
+              <TableCell className="flex flex-col gap-4">
+                <Button variant={"outline"}>
+                  <Link to={"/update-submission/" + submission._id}>
+                    Update
+                  </Link>
+                </Button>
+                <Button
+                  onClick={() => handleDelete(submission._id)}
+                  variant={"destructive"}
+                >
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
