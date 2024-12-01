@@ -11,15 +11,7 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import {
   Select,
@@ -30,34 +22,22 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Name must be at least 2 characters long" })
-    .max(50, { message: "Name must be at most 50 characters" }),
-  email: z.string().email(),
-  dob: z
-    .date()
-    .refine((date) => date <= new Date() && date > new Date("1900-01-01"), {
-      message: "Date of Birth must be a valid date",
-    }),
-  department: z.string().min(1, { message: "Department is required" }),
-  comments: z.string().optional(),
-});
+import { useNavigate, useParams } from "react-router-dom";
+import { formSchema } from "@/schemas/form-schema";
+import toast from "react-hot-toast";
 
 const UpdateSubmissionPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [subId, setSubId] = useState(null);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
-      // dob: "",
+      dob: "",
       department: "",
       comments: "",
     },
@@ -71,9 +51,10 @@ const UpdateSubmissionPage = () => {
             `http://localhost:5000/api/submission/${id}`
           );
           const submission = response.data;
-          submission.dob = new Date(submission.dob);
           setSubId(submission._id);
+          submission.dob = submission.dob.split("T")[0];
           form.reset(submission);
+          console.log(submission);
         } catch (error) {
           console.log(error);
         }
@@ -90,8 +71,11 @@ const UpdateSubmissionPage = () => {
         { ...values, _id: subId }
       );
       console.log(response);
+      toast.success("Updated your submission!");
+      navigate("/submissions");
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -136,37 +120,13 @@ const UpdateSubmissionPage = () => {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <input
+                  type="date"
+                  className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  {...field}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

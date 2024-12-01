@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import FormPage from "./components/FormPage";
 import SubmissionsPage from "./components/SubmissionsPage";
 import UpdateSubmissionPage from "./components/UpdateSubmissionPage";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
           </Routes>
         </section>
       </Router>
+      <Toaster />
     </main>
   );
 };

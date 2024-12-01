@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface Submission {
   _id: string;
@@ -67,9 +67,16 @@ const SubmissionsPage = () => {
           `http://localhost:5000/api/submission/${subId}`
         );
         console.log(response);
-        window.location.reload();
+        toast.success("Successfully deleted submission.");
+        setSubmissions((prev) => {
+          const submissions = prev.filter((sub) => sub._id !== subId);
+          return submissions;
+        });
       }
     } catch (error) {
+      toast.error(
+        "There was an error in deleting submission. Try again later."
+      );
       console.log(error);
     }
   };
@@ -93,7 +100,9 @@ const SubmissionsPage = () => {
             <TableRow key={submission._id}>
               <TableCell className="font-medium">{submission.name}</TableCell>
               <TableCell>{submission.email}</TableCell>
-              <TableCell>{submission.dob}</TableCell>
+              <TableCell>
+                {new Date(submission.dob).toLocaleDateString("en-GB")}
+              </TableCell>
               <TableCell>{submission.department}</TableCell>
               <TableCell className="">{submission.comments}</TableCell>
               <TableCell className="flex flex-col gap-4">
