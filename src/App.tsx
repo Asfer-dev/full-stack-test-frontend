@@ -11,7 +11,7 @@ const App = () => {
           <ul className="flex gap-4 max-w-lg mx-auto">
             <li>
               <Link className="hover:text-zinc-600 text-black" to="/">
-                Form Page
+                Add a Submission
               </Link>
             </li>
             <li>
@@ -19,7 +19,7 @@ const App = () => {
                 className="hover:text-zinc-600 text-black"
                 to="/submissions"
               >
-                Submissions Page
+                Submissions
               </Link>
             </li>
           </ul>
