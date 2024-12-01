@@ -27,7 +27,6 @@ cd your-repo-name
 Install the project dependencies using npm or yarn:
 
 ```bash
-Copy code
 # Using npm
 npm install
 
@@ -40,7 +39,6 @@ yarn install
 Run the development server to preview the application:
 
 ```bash
-Copy code
 # Using npm
 npm run dev
 
@@ -54,7 +52,6 @@ The development server will start, and the application will be available at http
 To create a production-ready build of the application:
 
 ```bash
-Copy code
 # Using npm
 npm run build
 
@@ -68,7 +65,6 @@ The output will be available in the dist directory.
 To preview the production build locally:
 
 ```bash
-Copy code
 # Using npm
 npm run preview
 
