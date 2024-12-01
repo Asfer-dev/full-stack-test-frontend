@@ -1,4 +1,4 @@
-# Vite React Project
+# Full Stack Test App
 
 This is a React application bootstrapped with [Vite](https://vitejs.dev/). Vite provides a fast and optimized development experience for modern web applications.
 
