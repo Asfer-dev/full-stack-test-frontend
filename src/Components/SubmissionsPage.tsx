@@ -13,8 +13,8 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-// Initialize Socket.IO client
-const socket = io("http://localhost:5000"); // Replace with your backend URL
+const socket = io("http://localhost:5000");
+
 interface Submission {
   _id: string;
   name: string;
@@ -28,19 +28,16 @@ const SubmissionsPage = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   useEffect(() => {
-    // Fetch initial submissions
     axios
-      .get("http://localhost:5000/api/submission") // Replace with your backend URL
+      .get("http://localhost:5000/api/submission")
       .then((response) => setSubmissions(response.data))
       .catch((error) => console.error(error));
 
-    // Listen for new submissions via Socket.IO
     socket.on("new_submission", (submission: Submission) => {
       setSubmissions((prev) => [submission, ...prev]);
       toast.success(`New submission added: ${submission.name}`);
     });
 
-    // Cleanup socket listener
     return () => {
       socket.off("new_submission");
     };
@@ -48,7 +45,7 @@ const SubmissionsPage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/submission") // Replace with your backend URL
+      .get("http://localhost:5000/api/submission")
       .then((response) => setSubmissions(response.data))
       .catch((error) => console.error(error));
   }, []);
