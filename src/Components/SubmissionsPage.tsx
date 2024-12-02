@@ -11,7 +11,10 @@ import {
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
+// Initialize Socket.IO client
+const socket = io("http://localhost:5000"); // Replace with your backend URL
 interface Submission {
   _id: string;
   name: string;
@@ -24,31 +27,22 @@ interface Submission {
 const SubmissionsPage = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-
-  // Set up the WebSocket connection when the component mounts
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:5000"); // Make sure to connect to the correct WebSocket endpoint
+    // Fetch initial submissions
+    axios
+      .get("http://localhost:5000/api/submission") // Replace with your backend URL
+      .then((response) => setSubmissions(response.data))
+      .catch((error) => console.error(error));
 
-    ws.onopen = () => {
-      console.log("Connected to WebSocket server");
-    };
+    // Listen for new submissions via Socket.IO
+    socket.on("new_submission", (submission: Submission) => {
+      setSubmissions((prev) => [submission, ...prev]);
+      toast.success(`New submission added: ${submission.name}`);
+    });
 
-    ws.onmessage = (event) => {
-      const newSubmission = JSON.parse(event.data); // Assuming the data is a stringified JSON
-      setSubmissions((prevSubmissions) => [...prevSubmissions, newSubmission]);
-    };
-
-    ws.onclose = () => {
-      console.log("Disconnected from WebSocket server");
-    };
-
-    // Set the WebSocket instance to state
-    setSocket(ws);
-
-    // Clean up the WebSocket connection when the component unmounts
+    // Cleanup socket listener
     return () => {
-      ws.close();
+      socket.off("new_submission");
     };
   }, []);
 
