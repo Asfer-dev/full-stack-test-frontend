@@ -18,8 +18,8 @@ Follow these steps to run the project locally:
 Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/Asfer-dev/full-stack-test-frontend.git
+cd full-stack-test-frontend
 ```
 
 ### 2. Install Dependencies
@@ -27,11 +27,9 @@ cd your-repo-name
 Install the project dependencies using npm or yarn:
 
 ```bash
-# Using npm
-npm install
+# Using pnpm
+pnpm install
 
-# OR using Yarn
-yarn install
 ```
 
 ### 3. Start the Development Server
@@ -39,11 +37,9 @@ yarn install
 Run the development server to preview the application:
 
 ```bash
-# Using npm
-npm run dev
+# Using pnpm
+pnpm run dev
 
-# OR using Yarn
-yarn dev
 The development server will start, and the application will be available at http://localhost:5173.
 ```
 
@@ -52,11 +48,9 @@ The development server will start, and the application will be available at http
 To create a production-ready build of the application:
 
 ```bash
-# Using npm
-npm run build
+# Using pnpm
+pnpm run build
 
-# OR using Yarn
-yarn build
 The output will be available in the dist directory.
 ```
 
@@ -65,9 +59,7 @@ The output will be available in the dist directory.
 To preview the production build locally:
 
 ```bash
-# Using npm
-npm run preview
+# Using pnpm
+pnpm run preview
 
-# OR using Yarn
-yarn preview
 ```
